@@ -2,14 +2,7 @@ import { StyleSheet, View, Text, Image, Alert, TouchableOpacity, ScrollView, Tex
 import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 
-//import Note from '@/components/Note';
-
 export default function AssetExample() {
-
-  const handlePressInput = () => {
-    Alert.alert('Você clicou para cadastrar uma nota!');
-    // Aqui você pode abrir um modal, navegar para outra tela, etc.
-  };
 
   const [listNotes, setListNotes] = useState([]);
   const [textInputTitle, setTextInputTitle] = useState("");
@@ -23,6 +16,8 @@ export default function AssetExample() {
 
     // evitar registros vazios
     if (textInputTitle == "" || textInputDesc == "") {
+      Alert.alert("Campos Vazios", "Por favor, preencha o título e a descrição da nota.");
+      return;
     } else {
 
       console.log(textInputDesc);
@@ -51,6 +46,7 @@ export default function AssetExample() {
       console.log(row.id, row.title, row.description);
       newArray.push({ id: row.id, name: row.title, desc: row.description });
     }
+    
     //Setando nossa lista para aparecer na tela
     setListNotes(newArray);
   }
