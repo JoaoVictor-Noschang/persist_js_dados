@@ -1,5 +1,7 @@
 import { StyleSheet, View, Text, Image, Alert, TouchableOpacity, ScrollView, TextInput, Button } from 'react-native';
 import { useEffect, useState } from 'react';
+import * as SQLite from 'expo-sqlite';
+
 
 //import Note from '@/components/Note';
 
@@ -10,15 +12,68 @@ export default function AssetExample() {
     // Aqui você pode abrir um modal, navegar para outra tela, etc.
   };
 
-  const [listNotes, setListNotes] = useState(["Nota01", "Nota02"]);
+  const [listNotes, setListNotes] = useState([]);
   const [textInput, setTextInput] = useState("");
 
-  const addNewNote = () => {
-    let newArray = listNotes;
+  async function addNewNote() {
+    /*let newArray = listNotes;
     newArray.push(textInput);
     setListNotes(newArray);
-    console.log(newArray);
+    console.log(newArray);*/
+
+    // evitar registros vazios
+    if (textInput == "") {
+
+    } else {
+      // da start na comunicação
+      const db = await SQLite.openDatabaseAsync('databaseName');
+
+      // Realiza o insert na tabela
+      await db.runAsync('INSERT INTO notes (title, description) VALUES (?, ?)', textInput, 'descrição teste...');
+
+      // Recuperando os dados registrados
+      const allRows = await db.getAllAsync('SELECT * FROM notes');
+      let newArray = [];
+      for (const row of allRows) {
+        console.log(row.id, row.title, row.description);
+        newArray.push(row.title);
+      }
+      //Setando nossa lista para aparecer na tela
+      setListNotes(newArray);
+    }
   };
+
+  useEffect(() => {
+    async function setup() {
+
+      //Iniciando o database
+      const db = await SQLite.openDatabaseAsync('databaseName');
+
+      /*await db.execAsync(`
+        PRAGMA journal_mode = WAL;
+        CREATE TABLE IF NOT EXISTS notes (
+          id INTEGER PRIMARY KEY NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT
+        );
+        INSERT INTO notes (title, description) VALUES ('Nota01', 'Estudar Django');
+        INSERT INTO notes (title, description) VALUES ('Nota02', 'Estudar JavaScript');
+        INSERT INTO notes (title, description) VALUES ('Nota03', 'Ler Senhor dos Anéis');
+      `);*/
+
+      // Recuperando os dados registrados
+      const allRows = await db.getAllAsync('SELECT * FROM notes');
+      let newArray = [];
+      for (const row of allRows) {
+        console.log(row.id, row.title, row.description);
+        newArray.push(row.title);
+      }
+      //Setando nossa lista para aparecer na tela
+      setListNotes(newArray);
+    }
+
+    setup();
+  }, []);
 
   return (
     <View style={styles.tela}>
