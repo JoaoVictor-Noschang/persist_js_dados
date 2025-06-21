@@ -98,32 +98,32 @@ export default function AssetExample() {
         />
       </View>
 
-      <Text style={styles.place}>Título da Nota</Text>
-      <TextInput
-        style={{ borderColor: '#000000', borderWidth: 1 }}
-        onChangeText={setTextInputTitle}
-        value={textInputTitle}
-      ></TextInput>
-      <Text style={styles.place}>Descrição</Text>
-      <TextInput
-        style={{ borderColor: '#000000', borderWidth: 1 }}
-        onChangeText={setTextInputDesc}
-        value={textInputDesc}
-      ></TextInput>
+      <View style={styles.form}>
+        <Text style={styles.label}>Título da Nota</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setTextInputTitle}
+          value={textInputTitle}
+        ></TextInput>
+        <Text style={styles.label}>Descrição</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setTextInputDesc}
+          value={textInputDesc}
+        ></TextInput>
+      </View>
 
       <TouchableOpacity style={styles.cadastrar} onPress={() => addNewNote()}>
         <Image
-          source={{
-            uri: 'https://reactnative.dev/docs/assets/p_cat2.png',
-          }}
+          source={require('./assets/icons/add_icon.png')}
           style={styles.plus}
         />
-        <Text style={styles.place}>Cadastrar Nota</Text>
+        <Text style={styles.cadbt}>Cadastrar Nota</Text>
       </TouchableOpacity>
 
 
       <Text style={styles.subtitle}>Notas Registradas</Text>
-      <ScrollView>
+      <ScrollView style={styles.scroll}>
 
         {
           listNotes.map((item, index) => {
@@ -156,12 +156,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5ebe0',
     width: '100%',
     height: '100%',
-    paddingTop: '20%',
+    paddingVeritcal: '10%',
     paddingHorizontal: 30,
-    paddingBottom: '10%',
   },
   header: {
     width: '100%',
+    paddingTop: '15%',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -173,17 +173,35 @@ const styles = StyleSheet.create({
     color: '#14213d',
   },
   perfil: {
-    width: 70,
-    height: 70,
-    borderWidth: 4,
+    width: 65,
+    height: 65,
+    borderWidth: 3,
     borderColor: '#14213d',
     borderRadius: 40,
     backgroundColor: '#fff',
   },
+  form:{
+    backgroundColor: '#d9d9d9',
+    padding: 15,
+    borderRadius: 15,
+    marginVertical: 15,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#14213d',
+    marginBottom: 5
+  },
+  input: {
+    borderColor: '#14213d', 
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    marginBottom: 10,
+  },
   cadastrar: {
     width: '100%',
-    marginVertical: 50,
-    padding: 25,
+    marginVertical: 5,
+    padding: 15,
     backgroundColor: '#fca311',
     borderRadius: 15,
     display: 'flex',
@@ -196,29 +214,28 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  place: {
+  cadbt: {
     fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 18,
-    color: '#14213d',
+    fontSize: 18
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginTop: 20,
+    marginBottom: 5,
+  },
+  scroll: {
+    marginBottom: 25,
+    borderRadius: 15,
   },
   nota: {
     backgroundColor: '#d9d9d9',
-    padding: 20,
+    padding: 15,
     borderRadius: 15,
-    marginVertical: 10,
+    marginVertical: 5,
   },
   head: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   opts: {
     display: 'flex',
@@ -228,15 +245,12 @@ const styles = StyleSheet.create({
   },
   btns: {
     borderRadius: 40,
-    padding: 8,
-    width: 40,
-    height: 40,
+    padding: 4,
+    width: 35,
+    height: 35,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  edit: {
-    backgroundColor: '#00b4d8',
   },
   delete: {
     backgroundColor: '#e76f51',
