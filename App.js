@@ -2,7 +2,6 @@ import { StyleSheet, View, Text, Image, Alert, TouchableOpacity, ScrollView, Tex
 import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 
-
 //import Note from '@/components/Note';
 
 export default function AssetExample() {
@@ -13,7 +12,8 @@ export default function AssetExample() {
   };
 
   const [listNotes, setListNotes] = useState([]);
-  const [textInput, setTextInput] = useState("");
+  const [textInputTitle, setTextInputTitle] = useState("");
+  const [textInputDesc, setTextInputDesc] = useState("");
 
   async function addNewNote() {
     /*let newArray = listNotes;
@@ -22,26 +22,50 @@ export default function AssetExample() {
     console.log(newArray);*/
 
     // evitar registros vazios
-    if (textInput == "") {
-
+    if (textInputTitle == "" || textInputDesc == "") {
     } else {
+
+      console.log(textInputDesc);
+
       // da start na comunicação
       const db = await SQLite.openDatabaseAsync('databaseName');
 
       // Realiza o insert na tabela
-      await db.runAsync('INSERT INTO notes (title, description) VALUES (?, ?)', textInput, 'descrição teste...');
+      await db.runAsync('INSERT INTO notes (title, description) VALUES (?, ?)', textInputTitle, textInputDesc);
 
-      // Recuperando os dados registrados
-      const allRows = await db.getAllAsync('SELECT * FROM notes');
-      let newArray = [];
-      for (const row of allRows) {
-        console.log(row.id, row.title, row.description);
-        newArray.push(row.title);
-      }
-      //Setando nossa lista para aparecer na tela
-      setListNotes(newArray);
+      getList();
+
+      setTextInputTitle(""); // Limpa o input do título
+      setTextInputDesc("");  // Limpa o input da descrição
     }
-  };
+  }
+
+  async function getList() {
+    // da start na comunicação
+    const db = await SQLite.openDatabaseAsync('databaseName');
+
+    // Recuperando os dados registrados
+    const allRows = await db.getAllAsync('SELECT * FROM notes');
+    let newArray = [];
+    for (const row of allRows) {
+      console.log(row.id, row.title, row.description);
+      newArray.push({ id: row.id, name: row.title, desc: row.description });
+    }
+    //Setando nossa lista para aparecer na tela
+    setListNotes(newArray);
+  }
+
+  async function removeNote(id) {
+
+    // da start na comunicação
+    const db = await SQLite.openDatabaseAsync('databaseName');
+
+    //console.log("Remove: " + id);
+    // Realiza o delete na tabela
+    await db.runAsync('DELETE FROM notes WHERE id = ?', id);
+
+    getList();
+  }
 
   useEffect(() => {
     async function setup() {
@@ -49,27 +73,16 @@ export default function AssetExample() {
       //Iniciando o database
       const db = await SQLite.openDatabaseAsync('databaseName');
 
-      /*await db.execAsync(`
+      await db.execAsync(`
         PRAGMA journal_mode = WAL;
         CREATE TABLE IF NOT EXISTS notes (
           id INTEGER PRIMARY KEY NOT NULL,
           title TEXT NOT NULL,
           description TEXT
         );
-        INSERT INTO notes (title, description) VALUES ('Nota01', 'Estudar Django');
-        INSERT INTO notes (title, description) VALUES ('Nota02', 'Estudar JavaScript');
-        INSERT INTO notes (title, description) VALUES ('Nota03', 'Ler Senhor dos Anéis');
-      `);*/
+      `);
 
-      // Recuperando os dados registrados
-      const allRows = await db.getAllAsync('SELECT * FROM notes');
-      let newArray = [];
-      for (const row of allRows) {
-        console.log(row.id, row.title, row.description);
-        newArray.push(row.title);
-      }
-      //Setando nossa lista para aparecer na tela
-      setListNotes(newArray);
+      getList();
     }
 
     setup();
@@ -88,7 +101,14 @@ export default function AssetExample() {
       <Text style={styles.place}>Título da Nota</Text>
       <TextInput
         style={{ borderColor: '#000000', borderWidth: 1 }}
-        onChangeText={setTextInput}
+        onChangeText={setTextInputTitle}
+        value={textInputTitle}
+      ></TextInput>
+      <Text style={styles.place}>Descrição</Text>
+      <TextInput
+        style={{ borderColor: '#000000', borderWidth: 1 }}
+        onChangeText={setTextInputDesc}
+        value={textInputDesc}
       ></TextInput>
 
       <TouchableOpacity style={styles.cadastrar} onPress={() => addNewNote()}>
@@ -107,12 +127,24 @@ export default function AssetExample() {
 
         {
           listNotes.map((item, index) => {
-            return (<View key={index}>
-              <Text>{item}</Text>
-            </View>)
+            return (
+              <View style={styles.nota} key={index}>
+                <View style={styles.head}>
+                  <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+                </View>
+                <Text>{item.desc}</Text>
+                <View style={styles.opts}>
+                  <TouchableOpacity title="Remove" style={[styles.btns, styles.delete]} onPress={() => removeNote(item.id)} >
+                    <Image
+                      source={require('./assets/icons/delete_icon.png')}
+                      style={styles.icons}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )
           })
         }
-
 
       </ScrollView>
     </View>
@@ -174,5 +206,43 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
+  },
+  nota: {
+    backgroundColor: '#d9d9d9',
+    padding: 20,
+    borderRadius: 15,
+    marginVertical: 10,
+  },
+  head: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  opts: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 15,
+  },
+  btns: {
+    borderRadius: 40,
+    padding: 8,
+    width: 40,
+    height: 40,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  edit: {
+    backgroundColor: '#00b4d8',
+  },
+  delete: {
+    backgroundColor: '#e76f51',
+  },
+  icons: {
+    width: '100%',
+    height: '100%',
   }
 });
